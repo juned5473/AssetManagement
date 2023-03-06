@@ -1,0 +1,147 @@
+
+
+
+CREATE PROCEDURE [dbo].[GetAssets]
+AS
+BEGIN
+  SET NOCOUNT ON;
+
+  SELECT AssetId, AssetName, AssetCategory, AssetType
+  FROM Assets;
+END
+
+
+CREATE PROCEDURE [dbo].[InsertAsset]
+  @AssetName nvarchar(50),
+  @AssetCategory nvarchar(50),
+  @AssetType nvarchar(50),
+  @AssetId INT OUTPUT
+AS
+BEGIN
+  SET NOCOUNT ON;   INSERT INTO Assets (AssetName, AssetCategory, AssetType)
+  VALUES (@AssetName, @AssetCategory, @AssetType);   SET @AssetId= SCOPE_IDENTITY()
+END
+
+
+CREATE PROCEDURE [dbo].[UpdateAsset]
+  @AssetId int,
+  @AssetName nvarchar(50),
+  @AssetCategory nvarchar(50),
+  @AssetType nvarchar(50)
+AS
+BEGIN   UPDATE Assets
+  SET AssetName = @AssetName, AssetCategory = @AssetCategory, AssetType = @AssetType
+  WHERE AssetId = @AssetId;
+
+
+
+CREATE PROCEDURE [dbo].[BulkUpdate]
+   @AssetsToUpdate AS AssetTableType READONLY
+   As
+   BEGIN
+   SET NOCOUNT ON;
+   MERGE INTO dbo.Assets A
+   USING @AssetsToUpdate T
+   on A.AssetId = T.AssetId
+   When MATCHED then
+   Update SET
+   A.AssetName = T.AssetName,
+   A.AssetCategory= T.AssetCategory,
+   A.AssetType=T.AssetType
+   when NOT MATCHED THEN
+    INSERT(AssetName,AssetCategory,AssetType)
+    VALUES(T.AssetName,T.AssetCategory,T.AssetType);
+   END
+
+
+
+
+
+
+CREATE PROCEDURE [dbo].[GetAssetById]
+  @AssetId int
+AS
+BEGIN
+  SET NOCOUNT ON;   SELECT AssetId, AssetName, AssetCategory, AssetType
+  FROM Assets
+  WHERE AssetId = @AssetId;
+END
+
+
+
+
+
+
+CREATE PROCEDURE [dbo].[InsertAssetImage]
+  @AssetId int,
+  @Name nvarchar(255),
+  @Content nvarchar(max) AS
+BEGIN
+  SET NOCOUNT ON;   INSERT INTO AssetImages(AssetId, Name, Content)
+  VALUES (@AssetId, @Name, @Content);   SELECT SCOPE_IDENTITY();
+END
+
+
+CREATE PROCEDURE [dbo].[InsertDocument]
+  @AssetId int,
+  @DocumentTitle nvarchar(255),
+  @Description nvarchar(255),
+  @FileName    nvarchar(255),
+  @FileExtension nvarchar(10),
+  @Content nvarchar(max) AS
+BEGIN
+  SET NOCOUNT ON;   INSERT INTO Documents(AssetId, DocumentTitle, Description,FileName, FileExtension,Content )
+  VALUES (@AssetId, @DocumentTitle, @Description,@FileName, @FileExtension, @Content);   SELECT SCOPE_IDENTITY();
+END
+
+
+
+
+
+
+CREATE PROCEDURE [dbo].[UpdateAssetDocument]
+    @DocumentId INT,
+    @AssetId Int,
+    @DocumentTitle NVARCHAR(100),
+    @Description NVARCHAR(500),
+    @Filename NVARCHAR(100),
+    @FileExtension NVARCHAR(10),
+    @Content NVARCHAR(MAX)
+AS
+BEGIN
+    UPDATE Documents
+    SET
+        AssetId=@AssetId,
+        DocumentTitle = @DocumentTitle,
+        Description = @Description,
+        Filename = @Filename,
+        FileExtension = @FileExtension,
+        Content = @Content
+    WHERE DocumentId = @DocumentId;
+END
+
+
+
+CREATE PROCEDURE [dbo].[UpdateAssetImage]
+    @AssetImageId INT,
+    @Name NVARCHAR(100),
+    @Content NVARCHAR(MAX)
+AS
+BEGIN
+    UPDATE AssetImages 
+    SET Name = @Name,
+        Content = @Content
+    WHERE AssetImageId = @AssetImageId;
+END 
+
+CREATE PROCEDURE [dbo].[UpdateAssetImage]
+    @AssetImageId INT,
+    @Name NVARCHAR(100),
+    @Content NVARCHAR(MAX)
+AS
+BEGIN
+    UPDATE AssetImages 
+    SET Name = @Name,
+        Content = @Content
+    WHERE AssetImageId = @AssetImageId;
+END 
